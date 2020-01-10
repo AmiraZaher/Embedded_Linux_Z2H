@@ -12,17 +12,22 @@ else
 	mkdir $trashDirec
 	chmod -R $trashDirec
 	echo "TRASH file is now created!"
+	#This command will make it run twice per day
+	(crontab -l 2>/dev/null; echo "0 5,17 * * * sdel.sh") | crontab
 fi
 
 find $trashDirec -type f -mtime +2 -exec rm -f {} \;
 
+#Loop on all the entered commands
 if [$# -nq 0 ]
 then
-	if [ -e $i ]
+	#Check whether it is a file or directory
+	if [ -e $i ] 
 	then	
 		for i in $@
 		do
 			fileType=`file --mime-type "$i" | cut -d: -f2`
+			#Zip it if not already done before moving it to trash			
 			if [ $fileType ~= application/gzip ]
 			then
 				tar cjf $i.tar.gz $i 
